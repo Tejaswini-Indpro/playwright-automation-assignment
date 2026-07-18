@@ -51,4 +51,17 @@ await form.configureTextBox(
 
 await form.saveForm();
 
+
+await form.openFormRules();
+
+await form.clickAddRule();
+
+await form.createRule(
+  "First Name - TextBox0",
+  "Contains",
+  "Playwright",
+  "Last Name - TextBox1",
+  "Disable"
+);
+
 });

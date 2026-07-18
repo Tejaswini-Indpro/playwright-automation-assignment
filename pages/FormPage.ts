@@ -1,4 +1,5 @@
 import { BasePage } from './BasePage';
+import { expect } from '@playwright/test';
 
 export class FormPage extends BasePage {
 
@@ -19,7 +20,14 @@ export class FormPage extends BasePage {
             name: /Create & edit/i
         }).click();
 
-        await this.page.waitForTimeout(5000);
+       const frame = this.page
+  .locator("iframe")
+  .first()
+  .contentFrame();
+
+await frame.locator(".formcanvas__leftpane").waitFor({
+  state: "visible",
+});
     }
 async addTwoTextBoxes() {
 
@@ -142,12 +150,151 @@ async saveForm() {
     .getByRole('button', { name: 'save' })
     .click();
 
-  // Wait for save to complete
-  await this.page.waitForLoadState('networkidle');
-  await this.page.waitForTimeout(3000);
+  // Wait for the success toast instead of networkidle
+  await this.page.getByText(/Successfully saved/i).waitFor({
+    state: 'visible',
+    timeout: 10000,
+  });
 
   console.log("Form saved successfully");
 }
 
+async openFormRules() {
+  const frame = this.page
+    .locator('iframe')
+    .first()
+    .contentFrame();
+
+  console.log("Opening Form Rules...");
+
+  const formRulesTab = frame.locator(".form-rule-list");
+
+  await formRulesTab.waitFor({
+    state: "visible",
+    timeout: 10000,
+  });
+
+  await formRulesTab.click();
+
+  console.log("Form Rules opened");
+
+ 
+}
+async clickAddRule() {
+  const frame = this.page
+    .locator('iframe')
+    .first()
+    .contentFrame();
+
+  const addRuleButton = frame.getByRole('button', {
+    name: 'Add rule',
+  });
+
+  await expect(addRuleButton).toBeVisible();
+  await expect(addRuleButton).toBeEnabled();
+
+  await addRuleButton.click();
+
+  console.log("Add Rule dialog opened");
+}
+
+
+
+async selectIfElement(element: string) {
+  const frame = this.page.locator("iframe").first().contentFrame();
+
+  console.log(`Selecting IF element: ${element}`);
+
+  const ifElement = frame
+    .locator("#Rule1")
+    .locator('input[placeholder="Select element"]')
+    .first();
+
+  await ifElement.click();
+
+  await frame.getByText(element, { exact: true }).click();
+
+  console.log("IF element selected");
+}
+
+async selectIfCondition(condition: string) {
+  const frame = this.page.locator("iframe").first().contentFrame();
+
+  console.log(`Selecting IF condition: ${condition}`);
+
+  const conditionInput = frame
+    .locator("#Rule1")
+    .locator('input[placeholder="Select condition"]');
+
+  await conditionInput.click();
+
+  await frame.getByText(condition, { exact: true }).click();
+
+  console.log("IF condition selected");
+}
+async enterIfValue(value: string) {
+  const frame = this.page.locator("iframe").first().contentFrame();
+
+  console.log(`Entering IF value: ${value}`);
+
+  const valueInput = frame
+    .locator("#Rule1")
+    .locator('input[placeholder="Enter value"]');
+
+  await valueInput.waitFor({ state: "visible" });
+  await valueInput.fill(value);
+
+  console.log("IF value entered");
+}
+async selectThenElement(element: string) {
+  const frame = this.page.locator("iframe").first().contentFrame();
+
+  console.log(`Selecting THEN element: ${element}`);
+
+  const thenElementInput = frame
+    .locator("#Rule1")
+    .locator('input[placeholder="Select element"]')
+    .last();
+
+  await thenElementInput.click();
+
+  await frame
+    .locator(".rio-select-input-dropdown-option")
+    .filter({ hasText: element })
+    .click({ force: true });
+
+  console.log("THEN element selected");
+}
+
+async selectThenAction(action: string) {
+  const frame = this.page.locator("iframe").first().contentFrame();
+
+  console.log(`Selecting THEN action: ${action}`);
+
+  const actionInput = frame
+    .locator("#Rule1")
+    .locator('input[placeholder="Select action"]');
+
+  await actionInput.click();
+
+  await frame.getByText(action, { exact: true }).click();
+
+  console.log("THEN action selected");
+}
+
+async createRule(
+  ifElement: string,
+  condition: string,
+  value: string,
+  thenElement: string,
+  action: string
+) {
+  await this.selectIfElement(ifElement);
+  await this.selectIfCondition(condition);
+  await this.enterIfValue(value);
+
+  await this.selectThenElement(thenElement);
+  await this.selectThenAction(action);
+}
 
 }
