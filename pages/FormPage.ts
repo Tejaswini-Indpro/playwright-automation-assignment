@@ -58,4 +58,96 @@ async addTwoTextBoxes() {
 
         
     }
+
+    async inspectProperties() {
+    const frame = this.page.locator('iframe').first().contentFrame();
+
+    await this.page.pause();
+}
+async configureTextBox(
+  label: string,
+  defaultValue: string,
+  minLength: string,
+  maxLength: string,
+  hint: string,
+  toolTip: string,
+  required = false
+) {
+  const frame = this.page
+    .locator('iframe')
+    .first()
+    .contentFrame();
+
+  console.log("Filling Element label...");
+  await frame.getByRole('textbox', { name: 'Element label' }).fill(label);
+
+  console.log("Filling Default value...");
+  await frame.getByRole('textbox', { name: 'Default value' }).fill(defaultValue);
+
+  console.log("Filling Min...");
+  await frame.getByRole('textbox', { name: 'Min' }).click();
+  await frame.getByRole('textbox', { name: 'Min' }).fill(minLength);
+
+  console.log("Filling Max...");
+  await frame.getByRole('textbox', { name: 'Max' }).click();
+  await frame.getByRole('textbox', { name: 'Max' }).fill(maxLength);
+
+  console.log("Filling Hint...");
+  await frame.getByRole('textbox', { name: 'Hint below field' }).fill(hint);
+
+  console.log("Filling Tool tip...");
+  await frame.locator('textarea[name="toolTip"]').fill(toolTip);
+
+  if (required) {
+    console.log("Checking Required...");
+    await frame
+      .locator('label')
+      .filter({ hasText: 'Make field required' })
+      .click();
+  }
+
+  console.log(`Configured textbox: ${label}`);
+}
+
+async clickTextBox(index: number) {
+  const frame = this.page
+    .locator('iframe')
+    .first()
+    .contentFrame();
+
+  const textBox = frame.locator(
+    `#textbox_editable-field_TextBox${index}`
+  );
+
+  await textBox.waitFor({ state: 'visible' });
+  await textBox.click();
+
+  await frame
+    .getByRole('textbox', { name: 'Element label' })
+    .waitFor();
+
+
+  await this.page.waitForTimeout(1000);
+}
+
+async saveForm() {
+  const frame = this.page
+    .locator('iframe')
+    .first()
+    .contentFrame();
+
+  console.log("Saving form...");
+
+  await frame
+    .getByRole('button', { name: 'save' })
+    .click();
+
+  // Wait for save to complete
+  await this.page.waitForLoadState('networkidle');
+  await this.page.waitForTimeout(3000);
+
+  console.log("Form saved successfully");
+}
+
+
 }

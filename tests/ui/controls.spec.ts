@@ -22,5 +22,33 @@ await form.createForm(
     formData.description
 );
     await form.addTwoTextBoxes();
+   
+
+// Configure first textbox
+await form.clickTextBox(0);
+
+await form.configureTextBox(
+  "First Name",
+  "",
+  "2",
+  "30",
+  "Enter first name",
+  "First name of the user",
+  true
+);
+
+await form.clickTextBox(1);
+
+await form.configureTextBox(
+  "Last Name",
+  "",
+  "2",
+  "30",
+  "Enter last name",
+  "Last name of the user",
+  true
+);
+
+await form.saveForm();
 
 });
