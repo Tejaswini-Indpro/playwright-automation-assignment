@@ -1,0 +1,15 @@
+import { BasePage } from './BasePage';
+
+export class LoginPage extends BasePage {
+
+    async login(username: string, password: string) {
+
+        await this.page.locator('input[name="username"]').fill(username);
+
+        await this.page.locator('input[name="password"]').fill(password);
+
+        await this.page.getByRole('button', { name: 'Log in' }).click();
+
+        await this.page.waitForLoadState('networkidle');
+    }
+}
