@@ -180,79 +180,46 @@ async openFormRules() {
 
  
 }
-async clickAddRule() {
-  const frame = this.page
-    .locator('iframe')
-    .first()
-    .contentFrame();
-
-  const addRuleButton = frame.getByRole('button', {
-    name: 'Add rule',
-  });
-
-  await expect(addRuleButton).toBeVisible();
-  await expect(addRuleButton).toBeEnabled();
-
-  await addRuleButton.click();
-
-  console.log("Add Rule dialog opened");
-}
 
 
 
-async selectIfElement(element: string) {
+
+async selectIfElement(ruleId: string, element: string) {
   const frame = this.page.locator("iframe").first().contentFrame();
 
-  console.log(`Selecting IF element: ${element}`);
-
   const ifElement = frame
-    .locator("#Rule1")
+    .locator(`#${ruleId}`)
     .locator('input[placeholder="Select element"]')
     .first();
 
   await ifElement.click();
-
   await frame.getByText(element, { exact: true }).click();
-
-  console.log("IF element selected");
 }
 
-async selectIfCondition(condition: string) {
+async selectIfCondition(ruleId: string, condition: string) {
   const frame = this.page.locator("iframe").first().contentFrame();
 
-  console.log(`Selecting IF condition: ${condition}`);
-
   const conditionInput = frame
-    .locator("#Rule1")
+    .locator(`#${ruleId}`)
     .locator('input[placeholder="Select condition"]');
 
   await conditionInput.click();
-
   await frame.getByText(condition, { exact: true }).click();
-
-  console.log("IF condition selected");
 }
-async enterIfValue(value: string) {
+async enterIfValue(ruleId: string, value: string) {
   const frame = this.page.locator("iframe").first().contentFrame();
-
-  console.log(`Entering IF value: ${value}`);
 
   const valueInput = frame
-    .locator("#Rule1")
+    .locator(`#${ruleId}`)
     .locator('input[placeholder="Enter value"]');
 
-  await valueInput.waitFor({ state: "visible" });
   await valueInput.fill(value);
-
-  console.log("IF value entered");
 }
-async selectThenElement(element: string) {
+async selectThenElement(ruleId: string, element: string) {
   const frame = this.page.locator("iframe").first().contentFrame();
 
-  console.log(`Selecting THEN element: ${element}`);
-
   const thenElementInput = frame
-    .locator("#Rule1")
+    .locator(`#${ruleId}`)
     .locator('input[placeholder="Select element"]')
     .last();
 
@@ -262,39 +229,47 @@ async selectThenElement(element: string) {
     .locator(".rio-select-input-dropdown-option")
     .filter({ hasText: element })
     .click({ force: true });
-
-  console.log("THEN element selected");
 }
 
-async selectThenAction(action: string) {
+async selectThenAction(ruleId: string, action: string) {
   const frame = this.page.locator("iframe").first().contentFrame();
 
-  console.log(`Selecting THEN action: ${action}`);
-
   const actionInput = frame
-    .locator("#Rule1")
+    .locator(`#${ruleId}`)
     .locator('input[placeholder="Select action"]');
 
   await actionInput.click();
 
   await frame.getByText(action, { exact: true }).click();
-
-  console.log("THEN action selected");
 }
 
 async createRule(
-  ifElement: string,
-  condition: string,
-  value: string,
-  thenElement: string,
-  action: string
+    ruleId: string,
+    ifElement: string,
+    condition: string,
+    value: string,
+    thenElement: string,
+    action: string
 ) {
-  await this.selectIfElement(ifElement);
-  await this.selectIfCondition(condition);
-  await this.enterIfValue(value);
+    await this.selectIfElement(ruleId, ifElement);
+    await this.selectIfCondition(ruleId, condition);
+    await this.enterIfValue(ruleId, value);
+    await this.selectThenElement(ruleId, thenElement);
+    await this.selectThenAction(ruleId, action);
+}
 
-  await this.selectThenElement(thenElement);
-  await this.selectThenAction(action);
+async clickAddRule() {
+    const frame = this.page.locator("iframe").first().contentFrame();
+
+    await frame.getByRole("button", { name: "Add rule" }).click();
+}
+
+async verifyRules() {
+    const frame = this.page.locator("iframe").first().contentFrame();
+
+    await expect(frame.getByText("Rule1")).toBeVisible();
+    await expect(frame.getByText("Rule2")).toBeVisible();
+    await expect(frame.getByText("Rule3")).toBeVisible();
 }
 
 }

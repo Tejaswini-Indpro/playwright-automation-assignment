@@ -57,11 +57,36 @@ await form.openFormRules();
 await form.clickAddRule();
 
 await form.createRule(
-  "First Name - TextBox0",
-  "Contains",
-  "Playwright",
-  "Last Name - TextBox1",
-  "Disable"
+    "Rule1",
+    "First Name - TextBox0",
+    "Contains",
+    "Playwright",
+    "Last Name - TextBox1",
+    "Disable"
 );
 
+await form.clickAddRule();
+
+await form.createRule(
+    "Rule2",
+    "Last Name - TextBox1",
+    "Contains",
+    "Automation",
+    "First Name - TextBox0",
+    "Enable"
+);
+
+await form.clickAddRule();
+
+await form.createRule(
+    "Rule3",
+    "First Name - TextBox0",
+    "Contains",
+    "Test",
+    "Last Name - TextBox1",
+    "Disable"
+);
+
+await form.saveForm();
+await form.verifyRules();
 });
